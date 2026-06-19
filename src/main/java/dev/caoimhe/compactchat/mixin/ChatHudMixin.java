@@ -37,7 +37,7 @@ public abstract class ChatHudMixin implements IChatHudExt {
         at = @At("HEAD"),
         argsOnly = true
     )
-    public Component compactChat$addMessage(final Component message) {
+    public Component compactChat$addClientSystemMessage(final Component message) {
         return this.messageManager.compactMessage(message);
     }
 
