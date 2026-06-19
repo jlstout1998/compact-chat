@@ -1,7 +1,7 @@
 package dev.caoimhe.compactchat.util;
 
 import dev.caoimhe.compactchat.config.Configuration;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 public class TextUtil {
     private TextUtil() {
@@ -10,7 +10,7 @@ public class TextUtil {
     /**
      * Converts a {@link Text} instance into a {@link String} that can be used to compare it with other {@link Text}.
      */
-    public static String stripIgnoredComponents(final Text text) {
+    public static String stripIgnoredComponents(final Component text) {
         final String textString = text.getString();
 
         if (Configuration.instance().ignoreFirstCharactersCount > 0) {
