@@ -8,6 +8,6 @@ import java.util.List;
  * An interface to be implemented by {@link net.minecraft.client.gui.hud.ChatHud} at runtime.
  */
 public interface IChatHudExt {
-    List<ChatHudLine> compactChat$getMessages();
+    List<GuiMessage> compactChat$getMessages();
     void compactChat$refreshMessages();
 }
