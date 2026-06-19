@@ -24,7 +24,7 @@ import java.util.List;
 public abstract class ChatHudMixin implements IChatHudExt {
     @Shadow
     @Final
-    private List<GuiMessage> messages;
+    private List<GuiMessage> allMessages;
 
     @Shadow
     protected abstract void refreshTrimmedMessages();
@@ -48,7 +48,7 @@ public abstract class ChatHudMixin implements IChatHudExt {
 
     @Override
     public List<GuiMessage> compactChat$getMessages() {
-        return this.messages;
+        return this.allMessages;
     }
 
     @Override
