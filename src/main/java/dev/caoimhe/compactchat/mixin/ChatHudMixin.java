@@ -27,7 +27,7 @@ public abstract class ChatHudMixin implements IChatHudExt {
     private List<GuiMessage> messages;
 
     @Shadow
-    protected abstract void refresh();
+    protected abstract void refreshTrimmedMessages();
 
     @Unique
     private final MessageManager messageManager = new MessageManager(this);
@@ -43,7 +43,7 @@ public abstract class ChatHudMixin implements IChatHudExt {
 
     @Inject(method = "clearMessages", at = @At("HEAD"))
     public void compactChat$clear(boolean clearHistory, CallbackInfo ci) {
-        this.messageManager.clear();
+        this.messageManager.clearMessages();
     }
 
     @Override
@@ -53,6 +53,6 @@ public abstract class ChatHudMixin implements IChatHudExt {
 
     @Override
     public void compactChat$refreshMessages() {
-        this.refresh();
+        this.refreshTrimmedMessages();
     }
 }
