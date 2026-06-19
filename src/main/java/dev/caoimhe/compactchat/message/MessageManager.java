@@ -4,11 +4,11 @@ import dev.caoimhe.compactchat.config.Configuration;
 import dev.caoimhe.compactchat.ext.IChatHudExt;
 import dev.caoimhe.compactchat.message.content.OccurrenceTextContent;
 import dev.caoimhe.compactchat.util.TextUtil;
-import net.minecraft.client.gui.hud.ChatHudLine;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.client.multiplayer.chat.GuiMessage;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -22,7 +22,7 @@ import java.util.Map;
  * @see dev.caoimhe.compactchat.mixin.ChatHudMixin
  */
 public class MessageManager {
-    private static final Style OCCURRENCE_TEXT_STYLE = Style.EMPTY.withColor(Formatting.GRAY);
+    private static final Style OCCURRENCE_TEXT_STYLE = Style.EMPTY.withColor(ChatFormatting.GRAY);
 
     private final IChatHudExt chatHud;
     private final Map<String, MessageTracker> messages;
@@ -39,7 +39,7 @@ public class MessageManager {
      *
      * @return The compacted message.
      */
-    public Text compactMessage(final Text text) {
+    public Component compactMessage(final Component text) {
         // We use a string representation of the message to compare it to another text.
         final String message = TextUtil.stripIgnoredComponents(text);
 
@@ -61,16 +61,16 @@ public class MessageManager {
         }
 
         // In order to append the occurrence counter (and do equality checks), we must make a mutable copy of the message.
-        final MutableText mutableMessage = text.copy();
+        final MutableComponent mutableMessage = text.copy();
 
         // Before returning the message with updated occurrences, we should remove any existing messages from the chat
         // history.
-        final ListIterator<ChatHudLine> iterator = this.chatHud.compactChat$getMessages().listIterator();
+        final ListIterator<GuiMessage> iterator = this.chatHud.compactChat$getMessages().listIterator();
         while (iterator.hasNext()) {
-            final ChatHudLine chatHudLine = iterator.next();
+            final GuiMessage chatHudLine = iterator.next();
 
             // In order to check equality with the incoming message, we need to remove the occurrence text content.
-            final MutableText contentWithoutOccurrences = chatHudLine.content().copy();
+            final MutableComponent contentWithoutOccurrences = chatHudLine.content().copy();
             contentWithoutOccurrences.getSiblings().removeIf(it -> it.getContent() instanceof OccurrenceTextContent);
 
             // In order to do a proper equality check, both instances must be a mutable copy of the message.
@@ -83,7 +83,7 @@ public class MessageManager {
         }
 
         // We can then create a new Text instance with the OccurrenceTextContent as a child.
-        final MutableText occurrencesText = OccurrenceTextContent.create(tracker.occurrences())
+        final MutableComponent occurrencesText = OccurrenceTextContent.create(tracker.occurrences())
             .setStyle(MessageManager.OCCURRENCE_TEXT_STYLE);
 
         return mutableMessage.append(occurrencesText);
@@ -99,7 +99,7 @@ public class MessageManager {
     /**
      * @return Whether the provided message should be ignored for compacting.
      */
-    private boolean shouldIgnore(final Text originalText, final String message) {
+    private boolean shouldIgnore(final Component originalText, final String message) {
         if (originalText.getString().isBlank()) {
             return true;
         }
