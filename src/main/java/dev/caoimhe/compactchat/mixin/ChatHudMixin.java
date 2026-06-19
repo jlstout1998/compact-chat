@@ -43,7 +43,7 @@ public abstract class ChatHudMixin implements IChatHudExt {
 
     @Inject(method = "clearMessages", at = @At("HEAD"))
     public void compactChat$clear(boolean clearHistory, CallbackInfo ci) {
-        this.messageManager.clearMessages();
+        this.messageManager.clear();
     }
 
     @Override
