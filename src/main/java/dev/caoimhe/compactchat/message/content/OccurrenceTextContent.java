@@ -1,23 +1,23 @@
 package dev.caoimhe.compactchat.message.content;
 
 import dev.caoimhe.compactchat.config.Configuration;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.PlainTextContent;
-import net.minecraft.text.StringVisitable;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.contents.PlainTextContents;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.Component;
 
 import java.util.Optional;
 
-public class OccurrenceTextContent implements PlainTextContent {
+public class OccurrenceTextContent implements PlainTextContents {
     private final int occurrences;
 
     public OccurrenceTextContent(final int occurrences) {
         this.occurrences = occurrences;
     }
 
-    public static MutableText create(final int occurrences) {
-        return MutableText.of(new OccurrenceTextContent(occurrences));
+    public static MutableComponent create(final int occurrences) {
+        return MutableComponent.create(new OccurrenceTextContent(occurrences));
     }
 
     @Override
@@ -30,12 +30,12 @@ public class OccurrenceTextContent implements PlainTextContent {
     }
 
     @Override
-    public <T> Optional<T> visit(StringVisitable.StyledVisitor<T> visitor, Style style) {
+    public <T> Optional<T> visit(FormattedText.StyledContentConsumer<T> visitor, Style style) {
         return visitor.accept(style, this.string());
     }
 
     @Override
-    public <T> Optional<T> visit(StringVisitable.Visitor<T> visitor) {
+    public <T> Optional<T> visit(FormattedText.ContentConsumer<T> visitor) {
         return visitor.accept(this.string());
     }
 
