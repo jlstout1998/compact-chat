@@ -2,9 +2,9 @@ package dev.caoimhe.compactchat.mixin;
 
 import dev.caoimhe.compactchat.ext.IChatHudExt;
 import dev.caoimhe.compactchat.message.MessageManager;
-import net.minecraft.client.gui.hud.ChatHud;
-import net.minecraft.client.gui.hud.ChatHudLine;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.components.ChatComponent;
+import net.minecraft.client.multiplayer.chat.GuiMessage;
+import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -20,11 +20,11 @@ import java.util.List;
  * The priority is set to the max value integer to ensure that this mixin is applied as late as possible.
  * See GitHub issue #23 for more information.
  */
-@Mixin(value = ChatHud.class, priority = Integer.MAX_VALUE)
+@Mixin(value = ChatComponent.class, priority = Integer.MAX_VALUE)
 public abstract class ChatHudMixin implements IChatHudExt {
     @Shadow
     @Final
-    private List<ChatHudLine> messages;
+    private List<GuiMessage> messages;
 
     @Shadow
     protected abstract void refresh();
@@ -33,21 +33,21 @@ public abstract class ChatHudMixin implements IChatHudExt {
     private final MessageManager messageManager = new MessageManager(this);
 
     @ModifyVariable(
-        method = "addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;Lnet/minecraft/client/gui/hud/MessageIndicator;)V",
+        method = "addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/multiplayer/chat/GuiMessageTag;)V",
         at = @At("HEAD"),
         argsOnly = true
     )
-    public Text compactChat$addMessage(final Text message) {
+    public Component compactChat$addMessage(final Component message) {
         return this.messageManager.compactMessage(message);
     }
 
-    @Inject(method = "clear", at = @At("HEAD"))
+    @Inject(method = "clearMessages", at = @At("HEAD"))
     public void compactChat$clear(boolean clearHistory, CallbackInfo ci) {
         this.messageManager.clear();
     }
 
     @Override
-    public List<ChatHudLine> compactChat$getMessages() {
+    public List<GuiMessage> compactChat$getMessages() {
         return this.messages;
     }
 
