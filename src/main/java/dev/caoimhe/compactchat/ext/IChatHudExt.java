@@ -1,6 +1,6 @@
 package dev.caoimhe.compactchat.ext;
 
-import net.minecraft.client.gui.hud.ChatHudLine;
+import net.minecraft.client.multiplayer.chat.GuiMessage;
 
 import java.util.List;
 
