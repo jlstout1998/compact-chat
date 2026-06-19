@@ -22,7 +22,7 @@ rootProject.buildFileName = "root.gradle.kts"
 
 listOf(
     "26.2-fabric",
-    "26.2-neoforge",
+    "1.21.8-neoforge",
 ).forEach { version ->
     include(":$version")
     project(":$version").apply {
