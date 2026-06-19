@@ -21,8 +21,8 @@ rootProject.name = "compact-chat"
 rootProject.buildFileName = "root.gradle.kts"
 
 listOf(
-    "1.21.1-fabric",
-    "1.21.1-neoforge",
+    "26.2-fabric",
+    "26.2-neoforge",
 ).forEach { version ->
     include(":$version")
     project(":$version").apply {
