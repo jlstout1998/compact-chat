@@ -10,7 +10,7 @@ fun Project.dependencyVersion(name: String, friendlyName: String = name, default
 }
 
 group = "dev.caoimhe"
-version = "3.1.0"
+version = "3.1.1"
 base.archivesName = "compact-chat-${project.name}"
 
 repositories {
@@ -34,8 +34,8 @@ dependencies {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
 }
 
 loom {
