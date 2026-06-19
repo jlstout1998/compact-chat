@@ -21,7 +21,7 @@ public class OccurrenceTextContent implements PlainTextContents {
     }
 
     @Override
-    public String string() {
+    public String text() {
         if (this.occurrences >= Configuration.instance().maximumOccurrences) {
             return " (" + Configuration.instance().maximumOccurrences + "+)";
         }
@@ -31,12 +31,12 @@ public class OccurrenceTextContent implements PlainTextContents {
 
     @Override
     public <T> Optional<T> visit(FormattedText.StyledContentConsumer<T> visitor, Style style) {
-        return visitor.accept(style, this.string());
+        return visitor.accept(style, this.text());
     }
 
     @Override
     public <T> Optional<T> visit(FormattedText.ContentConsumer<T> visitor) {
-        return visitor.accept(this.string());
+        return visitor.accept(this.text());
     }
 
     @Override
