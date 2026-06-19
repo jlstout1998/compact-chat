@@ -71,7 +71,7 @@ public class MessageManager {
 
             // In order to check equality with the incoming message, we need to remove the occurrence text content.
             final MutableComponent contentWithoutOccurrences = chatHudLine.content().copy();
-            contentWithoutOccurrences.getSiblings().removeIf(it -> it.getContent() instanceof OccurrenceTextContent);
+            contentWithoutOccurrences.getSiblings().removeIf(it -> it.getContents() instanceof OccurrenceTextContent);
 
             // In order to do a proper equality check, both instances must be a mutable copy of the message.
             final String content = TextUtil.stripIgnoredComponents(contentWithoutOccurrences);
