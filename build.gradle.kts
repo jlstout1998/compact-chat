@@ -1,6 +1,7 @@
 plugins {
     id("gg.essential.defaults")
     id("gg.essential.multi-version")
+    id("gg.essential.defaults.loom")
 }
 
 fun Project.dependencyVersion(name: String, friendlyName: String = name, defaultValue: String? = null): String {
