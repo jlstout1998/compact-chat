@@ -41,6 +41,14 @@ public abstract class ChatHudMixin implements IChatHudExt {
         return this.messageManager.compactMessage(message);
     }
 
+    @Inject(
+        method = "addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/multiplayer/chat/GuiMessageSource;Lnet/minecraft/client/multiplayer/chat/GuiMessageTag;)V",
+        at = @At("TAIL")
+    )
+    public void compactChat$trackLastAddedMessage(final CallbackInfo ci) {
+        this.messageManager.trackLastAddedMessage();
+    }
+
     @Inject(method = "clearMessages", at = @At("HEAD"))
     public void compactChat$clear(boolean clearHistory, CallbackInfo ci) {
         this.messageManager.clear();
