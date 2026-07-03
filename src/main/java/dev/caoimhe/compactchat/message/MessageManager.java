@@ -11,8 +11,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.ListIterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -25,12 +24,17 @@ public class MessageManager {
     private static final Style OCCURRENCE_TEXT_STYLE = Style.EMPTY.withColor(ChatFormatting.GRAY);
 
     private final IChatHudExt chatHud;
-    private final Map<String, MessageTracker> messages;
+    private final LinkedHashMap<String, MessageTracker> messages;
     private @Nullable String previousMessage;
 
     public MessageManager(final IChatHudExt chatHud) {
         this.chatHud = chatHud;
-        this.messages = new HashMap<>();
+        this.messages = new LinkedHashMap<>() {
+            @Override
+            protected boolean removeEldestEntry(final Map.Entry<String, MessageTracker> eldest) {
+                return this.size() > Configuration.instance().maxTrackedMessages;
+            }
+        };
         this.previousMessage = null;
     }
 
@@ -40,6 +44,8 @@ public class MessageManager {
      * @return The compacted message.
      */
     public Component compactMessage(final Component text) {
+        this.trimToConfiguredCap();
+        
         // We use a string representation of the message to compare it to another text.
         final String message = TextUtil.stripIgnoredComponents(text);
 
@@ -63,23 +69,12 @@ public class MessageManager {
         // In order to append the occurrence counter (and do equality checks), we must make a mutable copy of the message.
         final MutableComponent mutableMessage = text.copy();
 
-        // Before returning the message with updated occurrences, we should remove any existing messages from the chat
-        // history.
-        final ListIterator<GuiMessage> iterator = this.chatHud.compactChat$getMessages().listIterator();
-        while (iterator.hasNext()) {
-            final GuiMessage chatHudLine = iterator.next();
-
-            // In order to check equality with the incoming message, we need to remove the occurrence text content.
-            final MutableComponent contentWithoutOccurrences = chatHudLine.content().copy();
-            contentWithoutOccurrences.getSiblings().removeIf(it -> it.getContents() instanceof OccurrenceTextContent);
-
-            // In order to do a proper equality check, both instances must be a mutable copy of the message.
-            final String content = TextUtil.stripIgnoredComponents(contentWithoutOccurrences);
-            if (content.equals(message)) {
-                iterator.remove();
-                this.chatHud.compactChat$refreshMessages();
-                break;
-            }
+        // Use the tracked line reference to avoid scanning the full chat history for duplicates.
+        final GuiMessage previousLine = tracker.line();
+        if (previousLine != null) {
+            this.chatHud.compactChat$getMessages().remove(previousLine);
+            tracker.setLine(null);
+            this.chatHud.compactChat$refreshMessages();
         }
 
         // We can then create a new Text instance with the OccurrenceTextContent as a child.
@@ -88,7 +83,27 @@ public class MessageManager {
 
         return mutableMessage.append(occurrencesText);
     }
+    
+    /**
+     * Tracks the latest chat line after it has been inserted into the HUD list.
+     */
+    public void trackLastAddedMessage() {
+        final java.util.List<GuiMessage> chatLines = this.chatHud.compactChat$getMessages();
+        if (chatLines.isEmpty()) {
+            return;
+        }
 
+        final GuiMessage latestLine = chatLines.getFirst();
+        final MutableComponent contentWithoutOccurrences = latestLine.content().copy();
+        contentWithoutOccurrences.getSiblings().removeIf(it -> it.getContents() instanceof OccurrenceTextContent);
+
+        final String message = TextUtil.stripIgnoredComponents(contentWithoutOccurrences);
+        final MessageTracker tracker = this.messages.get(message);
+        if (tracker != null) {
+            tracker.setLine(latestLine);
+        }
+    }
+    
     /**
      * Clears any tracked messages from this {@link MessageManager} instance.
      */
@@ -96,6 +111,17 @@ public class MessageManager {
         this.messages.clear();
     }
 
+    /**
+     * Applies the current config cap immediately when it is reduced at runtime.
+     */
+    private void trimToConfiguredCap() {
+        final int maxTrackedMessages = Configuration.instance().maxTrackedMessages;
+        while (this.messages.size() > maxTrackedMessages) {
+            final String eldestKey = this.messages.keySet().iterator().next();
+            this.messages.remove(eldestKey);
+        }
+    }
+    
     /**
      * @return Whether the provided message should be ignored for compacting.
      */
