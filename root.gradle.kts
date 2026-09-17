@@ -6,7 +6,7 @@ plugins {
 
 preprocess {
     val fabric263 = createNode("26.3-fabric", 26_03_00, "official")
-    val neoforge263 = createNode("26.3-neoforge", 26_03_00, "official")
+    val neoforge262 = createNode("26.2-neoforge", 26_02_00, "official")
 
-    neoforge263.link(fabric263)    // Fabric 26.3    ->  NeoForge 26.3
+    neoforge262.link(fabric263)    // Fabric 26.3    ->  NeoForge 26.2
 }
