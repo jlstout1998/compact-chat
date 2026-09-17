@@ -27,7 +27,7 @@
         "compact-chat.mixins.json"
     ],
     "depends": {
-        "fabricloader": ">=0.19.3",
+        "fabricloader": ">=0.19.5",
         "minecraft": ">=${mcVersionStr}",
         "java": ">=25",
         "cloth-config": "*"
